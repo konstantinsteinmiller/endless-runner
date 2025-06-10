@@ -63,13 +63,11 @@ onUnmounted(() => {})
 
 <i18n>
 en:
-#  startGame: "Start Game"
-  startGame: "Rule Kingdom"
+  startGame: "Start Game"
   options: "Options"
   quit: "Quit game"
 de:
-#  startGame: "Spiel Starten"
-  startGame: "Reich regieren"
+  startGame: "Spiel Starten"
   options: "Einstellungen"
   quit: "Spiel beenden"
 </i18n>
