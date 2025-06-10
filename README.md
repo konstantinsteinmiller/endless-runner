@@ -5,7 +5,7 @@
 An endless runner mobile game.
 Vue.js
 <div style="display: flex; justify-items: center;">
-    <img src="https://github.com/konstantinsteinmiller/kingdom/blob/master/src/assets/documentation/vue-logo.png" alt="vue-logo" width="60" />
+    <img src="https://github.com/konstantinsteinmiller/kingdom/blob/master/public/images/vue-logo.png" alt="vue-logo" width="60" />
 </div>
 
 
