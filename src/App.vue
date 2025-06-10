@@ -1,0 +1,43 @@
+<template lang="pug">
+  div.flex.flex-col.h-screen.w-screen(id="main-app" class="sm:h-full")
+    main.game.relative
+      router-view
+      OptionsModal(
+        :show="isOptionsModalOpen"
+        @close="() => (isOptionsModalOpen = false)"
+      )
+</template>
+
+<script setup lang="ts">
+import OptionsModal from '@/components/molecules/OptionsModal.vue'
+import useMatch from '@/use/useMatch.ts'
+import '@/global'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const { isOptionsModalOpen } = useMatch()
+
+G.isDebug = route.query.debug === 'true' || localStorage.getItem('debug') === 'true'
+</script>
+
+<style scoped lang="sass">
+#app
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  text-align: center
+  color: #2c3e50
+</style>
+
+<style lang="sass">
+body
+  margin: 0
+  display: flex
+  place-items: center
+  min-width: 320px
+  min-height: 100vh
+  overflow: hidden
+
+.rib
+  & *, &
+    font-family: 'Ribeye', serif
+</style>
