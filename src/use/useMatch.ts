@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { Ref } from 'vue'
 
 const isStartingGame: Ref<boolean> = ref(false)
@@ -25,23 +25,34 @@ const useMatch = () => {
 
   const routes = ['/game']
   if (!isStartingGame.value && routes.some(route => window.location.hash.includes(route))) {
-    let themeQuery = ''
-    // console.log('window.location.hash: ', window.location.hash)
-    if (window.location.hash.includes('debug=')) {
-      const queries = window.location.hash.split('?')[1]?.split('&')
-      const includedList = ['debug']
-      const newQueries = queries.filter(query => includedList.includes(query.split('=')[0]))
-      themeQuery = `?${newQueries.join('&')}`
-    }
-    window.location.pathname = '/'
-    window.location.hash = `#/${themeQuery}`
-    window.location.reload()
+    // let themeQuery = ''
+    // // console.log('window.location.hash: ', window.location.hash)
+    // if (window.location.hash.includes('debug=')) {
+    //   const queries = window.location.hash.split('?')[1]?.split('&')
+    //   const includedList = ['debug']
+    //   const newQueries = queries.filter(query => includedList.includes(query.split('=')[0]))
+    //   themeQuery = `?${newQueries.join('&')}`
+    // }
+    // window.location.pathname = '/'
+    // window.location.hash = `#/${themeQuery}`
+    // window.location.reload()
+  }
+
+  const setIsGameOver = (value: boolean) => {
+    isGameOver.value = value
+  }
+
+  const restartGame = () => {
+    isGameOver.value = false
+    // You might want to emit an event or call a function in GameUI to reset game state
   }
 
   return {
     resetMatch,
     isStartingGame,
-    isGameOver,
+    isGameOver: computed(() => isGameOver.value), // Expose as computed for read-only access
+    setIsGameOver,
+    restartGame,
     isSplashScreenVisible,
     isDbInitialized,
     isOptionsModalOpen,
