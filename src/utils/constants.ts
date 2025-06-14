@@ -37,11 +37,12 @@ export const SCROLL_SPEED_BG_FAR: number = 1
 export const SCROLL_SPEED_BG_MID: number = 3
 export const SCROLL_SPEED_FOREGROUND: number = 5 // This will be the main game speed
 
+export const TOTAL_ENEMY_TYPES: number = 5
 export const ENEMY_WIDTH: number = 48
 export const ENEMY_HEIGHT: number = 48
 export const OBSTACLE_WIDTH: number = 64
 export const OBSTACLE_HEIGHT: number = 64
 export const ENEMY_SPAWN_INTERVAL: number = 2000 // ms
-export const OBSTACLE_SPAWN_INTERVAL: number = 3000 // ms
+export const OBSTACLE_SPAWN_INTERVAL: number = 2715 // ms
 export const MAX_ENEMIES_ON_SCREEN: number = 3
 export const MAX_OBSTACLES_ON_SCREEN: number = 2

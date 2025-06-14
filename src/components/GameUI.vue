@@ -3,7 +3,9 @@ import { computed, onMounted, onUnmounted, ref, type Ref } from 'vue'
 import GameOverScreen from '@/components/GameOverScreen.vue'
 import Player from '@/components/atoms/Player.vue'
 import Enemy from '@/components/atoms/Enemy.vue'
+import enemy from '@/components/atoms/Enemy.vue'
 import Obstacle from '@/components/atoms/Obstacle.vue'
+import obstacle from '@/components/atoms/Obstacle.vue'
 
 import useMatch from '@/use/useMatch.ts'
 import { useGameLoop } from '@/use/useGameLoop'
@@ -12,22 +14,23 @@ import useInput from '@/use/useInput'
 import { useCollisionDetection } from '@/use/useCollisionDetection'
 import { useParallaxBackground } from '@/use/useParallaxBackground'
 import {
-  GAME_WIDTH,
-  GAME_HEIGHT,
-  PLAYER_WIDTH,
-  PLAYER_HEIGHT,
-  ENEMY_WIDTH,
   ENEMY_HEIGHT,
-  OBSTACLE_WIDTH,
-  OBSTACLE_HEIGHT,
-  GROUND_Y,
-  SCROLL_SPEED_FOREGROUND,
   ENEMY_SPAWN_INTERVAL,
-  OBSTACLE_SPAWN_INTERVAL,
+  ENEMY_WIDTH,
+  GAME_HEIGHT,
+  GAME_WIDTH,
+  GROUND_Y,
   MAX_ENEMIES_ON_SCREEN,
   MAX_OBSTACLES_ON_SCREEN,
+  OBSTACLE_SPAWN_INTERVAL,
+  PLAYER_HEIGHT,
+  PLAYER_WIDTH,
+  SCROLL_SPEED_FOREGROUND,
+  TOTAL_ENEMY_TYPES,
 } from '@/utils/constants.ts'
 import Background from '@/components/atoms/Background.vue'
+import { OBSTACLE_TYPES, TOTAL_OBSTACLES_TYPES } from '@/utils/enums.ts'
+import Score from '@/components/atoms/Score.vue'
 
 // Match State
 const { isGameOver, setIsGameOver, restartGame } = useMatch()
@@ -45,12 +48,25 @@ interface GameEntity {
   y: number
   width: number
   height: number
+  type?: number
 }
 const enemiesList: Ref<GameEntity[]> = ref([])
 const obstaclesList: Ref<GameEntity[]> = ref([])
 
 let enemySpawnTimer: number = 0
 let obstacleSpawnTimer: number = 0
+let obstaclesDodgedTotal: number = 0
+let enemiesDodgedTotal: number = 0
+let timePlayed = ref<number>(0)
+
+const speed = computed(() => {
+  const steps = timePlayed.value / 5000
+  return 1.0 + Math.floor(steps) * 0.1 // Increase speed by 10% every 5 seconds
+})
+const maxObstaclesOnScreen = computed(() => Math.floor(speed.value * MAX_OBSTACLES_ON_SCREEN))
+const maxEnemiesOnScreen = computed(() => {
+  return Math.floor(speed.value * MAX_ENEMIES_ON_SCREEN)
+})
 
 // Collision Detection
 const { checkCollision } = useCollisionDetection()
@@ -65,6 +81,8 @@ const updateGame = (deltaTime: number) => {
     return
   }
 
+  timePlayed.value += deltaTime
+
   // Update Player
   updatePlayer(deltaTime)
 
@@ -73,39 +91,69 @@ const updateGame = (deltaTime: number) => {
 
   // Update Enemies
   enemiesList.value.forEach(enemy => {
-    enemy.x -= SCROLL_SPEED_FOREGROUND
+    enemy.x -= SCROLL_SPEED_FOREGROUND * 1.1 * speed.value // Adjust speed based on game speed
   })
-  enemiesList.value = enemiesList.value.filter(enemy => enemy.x + enemy.width > 0) // Remove off-screen
+  enemiesList.value = enemiesList.value.filter(entity => {
+    const didDodgeEntity = entity.x + entity.width < 0
+    if (didDodgeEntity) {
+      enemiesDodgedTotal++
+    }
+    return entity.x + entity.width > 0 // isEntityOutOfBounds
+  }) // Remove off-screen
 
   // Update Obstacles
   obstaclesList.value.forEach(obstacle => {
-    obstacle.x -= SCROLL_SPEED_FOREGROUND
+    obstacle.x -= SCROLL_SPEED_FOREGROUND * speed.value // Adjust speed based on game speed
   })
-  obstaclesList.value = obstaclesList.value.filter(obstacle => obstacle.x + obstacle.width > 0) // Remove off-screen
+  obstaclesList.value = obstaclesList.value.filter(entity => {
+    const didDodgeEntity = entity.x + entity.width < 0
+    if (didDodgeEntity) {
+      obstaclesDodgedTotal++
+    }
+    return entity.x + entity.width > 0 // isEntityOutOfBounds
+  }) // Remove off-screen
 
   // Spawn Enemies
   enemySpawnTimer += deltaTime
-  if (enemySpawnTimer > ENEMY_SPAWN_INTERVAL && enemiesList.value.length < MAX_ENEMIES_ON_SCREEN) {
-    enemiesList.value.push({
+  if (
+    enemySpawnTimer > ENEMY_SPAWN_INTERVAL - speed.value * 50 &&
+    enemiesList.value.length < maxEnemiesOnScreen.value
+  ) {
+    const MAX_ENEMY_Y = GROUND_Y - ENEMY_HEIGHT
+    const unclampedRandomInt = Math.floor(Math.random() * TOTAL_ENEMY_TYPES) + 1
+    const type = unclampedRandomInt.clamp(0, TOTAL_ENEMY_TYPES)
+
+    const enemy = {
       id: Date.now() + Math.random(),
       x: GAME_WIDTH + Math.random() * 200, // Spawn just off-screen
-      y: GROUND_Y - ENEMY_HEIGHT,
+      y: Math.floor(Math.random() * MAX_ENEMY_Y),
       width: ENEMY_WIDTH,
       height: ENEMY_HEIGHT,
-    })
+      type, // Random type for variety
+    }
+    enemiesList.value.push(enemy)
     enemySpawnTimer = 0
   }
 
   // Spawn Obstacles
   obstacleSpawnTimer += deltaTime
-  if (obstacleSpawnTimer > OBSTACLE_SPAWN_INTERVAL && obstaclesList.value.length < MAX_OBSTACLES_ON_SCREEN) {
-    obstaclesList.value.push({
+  if (
+    obstacleSpawnTimer > OBSTACLE_SPAWN_INTERVAL - speed.value * 50 &&
+    obstaclesList.value.length < maxObstaclesOnScreen.value
+  ) {
+    const unclampedRandomInt = Math.floor(Math.random() * TOTAL_OBSTACLES_TYPES) + 1
+    const type = unclampedRandomInt.clamp(0, TOTAL_ENEMY_TYPES)
+    const obstacleDimensions = OBSTACLE_TYPES[type]
+    const MAX_OBSTACLE_Y = GROUND_Y - obstacleDimensions.height
+    const obstacle = {
       id: Date.now() + Math.random(),
       x: GAME_WIDTH + Math.floor(Math.random() * 300), // Spawn just off-screen
-      y: GROUND_Y - OBSTACLE_HEIGHT,
-      width: OBSTACLE_WIDTH,
-      height: OBSTACLE_HEIGHT,
-    })
+      y: Math.floor(Math.random() * MAX_OBSTACLE_Y),
+      width: OBSTACLE_TYPES[type].width,
+      height: OBSTACLE_TYPES[type].height,
+      type, // Random type for variety
+    }
+    obstaclesList.value.push(obstacle)
     obstacleSpawnTimer = 0
   }
 
@@ -134,22 +182,29 @@ const updateGame = (deltaTime: number) => {
 useGameLoop({ onUpdate: updateGame, isRunning: isGameRunning })
 
 const resetGameState = () => {
-  // Reset game specific states
+  cleanup()
   enemiesList.value = []
   obstaclesList.value = []
   enemySpawnTimer = 0
   obstacleSpawnTimer = 0
+  obstaclesDodgedTotal = 0
+  enemiesDodgedTotal = 0
+  timePlayed.value = 0
+
   stopFlying()
-  isJumping.value = false // Ensure game loop resumes
-  isFlying.value = false // Ensure game loop resumes
-  isGameRunning.value = true // Ensure game loop resumes
+  isJumping.value = false
+  isFlying.value = false
+  isGameRunning.value = true
+
+  useInput()
 }
 
 // Handle Restart Game from GameOverScreen
 const onRestartGame = () => {
-  restartGame()
-
-  resetGameState()
+  setTimeout(() => {
+    resetGameState()
+    restartGame()
+  })
 }
 
 onMounted(() => {})
@@ -180,25 +235,33 @@ const gameHeight = computed(() => {
     Enemy(
       v-for="enemy in enemiesList"
       :key="enemy.id"
-      :x="enemy.x"
-      :y="enemy.y"
+      :entity="enemy"
+      :time="timePlayed"
+      :speed="speed"
     )
 
     Obstacle(
       v-for="obstacle in obstaclesList"
       :key="obstacle.id"
-      :x="obstacle.x"
-      :y="obstacle.y"
+      :entity="obstacle"
+      :time="timePlayed"
+      :speed="speed"
     )
 
     // Game Over Screen
     GameOverScreen(v-if="isGameOver" @restart="onRestartGame")
 
     .absolute.top-4.left-4.text-white.text-sm.z-50
-      div Player Y: {{ playerY.toFixed(2) }}
-      div Is Flying: {{ isFlying }}
-      div Enemies: {{ enemiesList.length }}
-      div Obstacles: {{ obstaclesList.length }}
+      //div Player Y: {{ playerY.toFixed(2) }}
+      //div Is Flying: {{ isFlying }}
+      //div Enemies: {{ enemiesList.length }}
+      //div Obstacles: {{ obstaclesList.length }}
+    Score(
+      :obstaclesTotal="obstaclesDodgedTotal"
+      :enemiesTotal="enemiesDodgedTotal"
+      :time="timePlayed"
+      :speed="speed"
+    )
 </template>
 
 <style scoped lang="sass">

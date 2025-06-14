@@ -1,7 +1,6 @@
-import { ref, watch, type Ref } from 'vue'
+import { ref, watch } from 'vue'
 import {
   GRAVITY,
-  JUMP_STRENGTH,
   GROUND_Y,
   PLAYER_WIDTH,
   PLAYER_HEIGHT,

@@ -16,6 +16,7 @@ const touchstart = (e: TouchEvent) => {
   if (isGameOver.value) return // Prevent input if game is over
   e.preventDefault() // Crucial to prevent browser gestures
   startFlying()
+  console.log('touchstart: ')
 
   // if (!timer) {
   // timer = setInterval(onLongTouch, touchDuration, 16.66)
@@ -57,24 +58,24 @@ const onContextMenu = (event: any) => {
 
 let hasControlsAdded = false
 
-export const useInput = () => {
-  const onKeyDown = (event: KeyboardEvent) => {
-    if (isGameOver.value) return
-    // Spacebar to trigger flight
-    if (event.code === 'Space') {
-      event.preventDefault()
-      startFlying()
-    }
+const onKeyDown = (event: KeyboardEvent) => {
+  if (isGameOver.value) return
+  // Spacebar to trigger flight
+  if (event.code === 'Space') {
+    event.preventDefault()
+    startFlying()
   }
-  const onKeyUp = (event: KeyboardEvent) => {
-    if (isGameOver.value) return
-    // Release spacebar to stop flight
-    if (event.code === 'Space') {
-      event.preventDefault()
-      stopFlying()
-    }
+}
+const onKeyUp = (event: KeyboardEvent) => {
+  if (isGameOver.value) return
+  // Release spacebar to stop flight
+  if (event.code === 'Space') {
+    event.preventDefault()
+    stopFlying()
   }
+}
 
+export const useInput = () => {
   if (!hasControlsAdded) {
     window.addEventListener('keydown', onKeyDown, { passive: false })
     window.addEventListener('keyup', onKeyUp, { passive: false })
