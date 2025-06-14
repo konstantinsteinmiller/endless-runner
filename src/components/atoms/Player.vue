@@ -10,10 +10,10 @@ defineProps<PlayerProps>()
 </script>
 
 <template lang="pug">
-  div(
+  img(
+    src="/images/player/player_376x497.webp"
     :style="{ transform: `translate3d(${x}px, ${y}px, 0)` }"
-    class="player absolute bg-blue-500 rounded-lg"
-    :class="['w-20', 'h-24']"
+    class="player w-8 h-10 z-[100] absolute  rounded-lg bg-transparent"
   )
 </template>
 

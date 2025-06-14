@@ -12,8 +12,7 @@ defineProps<ObstacleProps>()
 <template lang="pug">
   div(
     :style="{ transform: `translate3d(${x}px, ${y}px, 0)` }"
-    class="absolute bg-yellow-300 rounded-md"
-    :class="['w-20', 'h-20']"
+    class="absolute w-16 h-16 z-[100] bg-yellow-300 rounded-md"
   )
 </template>
 

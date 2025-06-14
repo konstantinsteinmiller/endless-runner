@@ -8,6 +8,7 @@ import Obstacle from '@/components/atoms/Obstacle.vue'
 import useMatch from '@/use/useMatch.ts'
 import { useGameLoop } from '@/use/useGameLoop'
 import { usePlayer } from '@/use/usePlayer'
+import useInput from '@/use/useInput'
 import { useCollisionDetection } from '@/use/useCollisionDetection'
 import { useParallaxBackground } from '@/use/useParallaxBackground'
 import {
@@ -26,14 +27,16 @@ import {
   MAX_ENEMIES_ON_SCREEN,
   MAX_OBSTACLES_ON_SCREEN,
 } from '@/utils/constants.ts'
+import Background from '@/components/atoms/Background.vue'
 
 // Match State
 const { isGameOver, setIsGameOver, restartGame } = useMatch()
 const isGameRunning: Ref<boolean> = ref(true)
 
-console.log(' GAME_WIDTH, GAME_HEIGHT, ', GAME_WIDTH, GAME_HEIGHT)
 // Player
-const { playerX, playerY, isJumping, jump, updatePlayer } = usePlayer(isGameOver)
+const { playerX, playerY, isJumping, isFlying, stopFlying, updatePlayer } = usePlayer()
+
+const { cleanup } = useInput()
 
 // Enemies and Obstacles
 interface GameEntity {
@@ -53,7 +56,7 @@ let obstacleSpawnTimer: number = 0
 const { checkCollision } = useCollisionDetection()
 
 // Parallax Background
-const { bgFarX1, bgFarX2, bgMidX1, bgMidX2, fgX1, fgX2, updateBackground } = useParallaxBackground(isGameRunning)
+const { updateBackground } = useParallaxBackground(isGameRunning)
 
 // Game Loop Update Function
 const updateGame = (deltaTime: number) => {
@@ -98,7 +101,7 @@ const updateGame = (deltaTime: number) => {
   if (obstacleSpawnTimer > OBSTACLE_SPAWN_INTERVAL && obstaclesList.value.length < MAX_OBSTACLES_ON_SCREEN) {
     obstaclesList.value.push({
       id: Date.now() + Math.random(),
-      x: GAME_WIDTH + Math.random() * 300, // Spawn just off-screen
+      x: GAME_WIDTH + Math.floor(Math.random() * 300), // Spawn just off-screen
       y: GROUND_Y - OBSTACLE_HEIGHT,
       width: OBSTACLE_WIDTH,
       height: OBSTACLE_HEIGHT,
@@ -130,31 +133,29 @@ const updateGame = (deltaTime: number) => {
 // Initialize Game Loop
 useGameLoop({ onUpdate: updateGame, isRunning: isGameRunning })
 
-// Handle Keyboard Input for Jumping
-const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.code === 'Space' && !isJumping.value && !isGameOver.value) {
-    event.preventDefault()
-    jump()
-  }
-}
-
-// Handle Restart Game from GameOverScreen
-const handleRestartGame = () => {
-  restartGame()
+const resetGameState = () => {
   // Reset game specific states
   enemiesList.value = []
   obstaclesList.value = []
   enemySpawnTimer = 0
   obstacleSpawnTimer = 0
+  stopFlying()
+  isJumping.value = false // Ensure game loop resumes
+  isFlying.value = false // Ensure game loop resumes
   isGameRunning.value = true // Ensure game loop resumes
 }
 
-onMounted(() => {
-  window.addEventListener('keydown', handleKeyDown)
-})
+// Handle Restart Game from GameOverScreen
+const onRestartGame = () => {
+  restartGame()
+
+  resetGameState()
+}
+
+onMounted(() => {})
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeyDown)
+  cleanup()
 })
 const gameWidth = computed(() => {
   return GAME_WIDTH
@@ -168,30 +169,7 @@ const gameHeight = computed(() => {
   .game-container.relative.overflow-hidden(:style="{ width: `${GAME_WIDTH}px`, height: `${GAME_HEIGHT}px` }")
     // Parallax Background Layers
     // Far Background (slowest)
-    .background-layer.absolute.top-0.left-0.w-full.h-full.z-0.bg-gray-400.opacity-20(
-      :style="{ transform: `translate3d(${bgFarX1}px, 0, 0)` }"
-    )
-    .background-layer.absolute.top-0.left-0.w-full.h-full.z-0.bg-gray-800.opacity-20(
-
-      :style="{ transform: `translate3d(${bgFarX2}px, 0, 0)` }"
-    )
-    //class="bg-[url('images/bg/bgFar.jpg')] bg-repeat-x bg-cover"
-
-    // Mid Background
-    .background-layer.absolute.top-0.left-0.w-full.h-full.z-10.bg-gray-500.opacity-20(
-      :style="{ transform: `translate3d(${bgMidX1}px, 0, 0)` }"
-    )
-    .background-layer.absolute.top-0.left-0.w-full.h-full.z-10.bg-gray-500.opacity-20(
-      :style="{ transform: `translate3d(${bgMidX2}px, 0, 0)` }"
-    )
-
-    // Foreground (main game speed - ground)
-    .background-layer.absolute.top-0.left-0.w-full.h-full.z-20.bg-gray-600.opacity-20(
-      :style="{ transform: `translate3d(${fgX1}px, 0, 0)` }"
-    )
-    .background-layer.absolute.top-0.left-0.w-full.h-full.z-20.bg-gray-600.opacity-20(
-      :style="{ transform: `translate3d(${fgX2}px, 0, 0)` }"
-    )
+    Background
 
     // Game Elements
     Player(
@@ -214,27 +192,20 @@ const gameHeight = computed(() => {
     )
 
     // Game Over Screen
-    //GameOverScreen(v-if="isGameOver" @restart="handleRestartGame")
+    GameOverScreen(v-if="isGameOver" @restart="onRestartGame")
 
     .absolute.top-4.left-4.text-white.text-sm.z-50
       div Player Y: {{ playerY.toFixed(2) }}
-      div Is Jumping: {{ isJumping }}
+      div Is Flying: {{ isFlying }}
       div Enemies: {{ enemiesList.length }}
       div Obstacles: {{ obstaclesList.length }}
-  //canvas(id="game" class="w-screen h-screen bg-gray-300 block mx-auto my-0")
-  //BGPanel(:index="0")
-  //BGPanel(:index="1")
 </template>
 
 <style scoped lang="sass">
 .game-container
-  // Set a fixed size for the game view. This will be the "world" dimensions.
-  // Tailwind's w-screen and h-screen make it full screen.
-  // We apply the exact dimensions here to match our GAME_WIDTH/HEIGHT constants.
-  // For responsive design, you'd scale this container.
   width: v-bind(gameWidth)
   height: v-bind(gameHeight)
-  background-color: #87CEEB // A sky-like default background for testing
+  background-color: #87CEEB
   margin: 0 auto
 
   .background-layer

@@ -50,7 +50,7 @@ const useMatch = () => {
   return {
     resetMatch,
     isStartingGame,
-    isGameOver: computed(() => isGameOver.value), // Expose as computed for read-only access
+    isGameOver,
     setIsGameOver,
     restartGame,
     isSplashScreenVisible,

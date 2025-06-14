@@ -1,14 +1,14 @@
 import { ref, type Ref } from 'vue'
 import { GAME_WIDTH, SCROLL_SPEED_BG_FAR, SCROLL_SPEED_BG_MID, SCROLL_SPEED_FOREGROUND } from '@/utils/constants.ts'
 
-export function useParallaxBackground(isRunning: Ref<boolean>) {
-  const bgFarX1 = ref(0)
-  const bgFarX2 = ref(GAME_WIDTH)
-  const bgMidX1 = ref(0)
-  const bgMidX2 = ref(GAME_WIDTH)
-  const fgX1 = ref(0)
-  const fgX2 = ref(GAME_WIDTH)
+export const bgFarX1 = ref(0)
+export const bgFarX2 = ref(GAME_WIDTH)
+export const bgMidX1 = ref(0)
+export const bgMidX2 = ref(GAME_WIDTH)
+export const fgX1 = ref(0)
+export const fgX2 = ref(GAME_WIDTH)
 
+export function useParallaxBackground(isRunning: Ref<boolean>) {
   const updateBackground = (deltaTime: number) => {
     if (!isRunning.value) return
 

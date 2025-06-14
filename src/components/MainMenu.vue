@@ -35,7 +35,9 @@ onUnmounted(() => {})
 </script>
 
 <template lang="pug">
-  div.fixed.top-0.left-0.w-full.h-full
+  div.fixed.top-0.left-0.w-full.h-full.relative
+    img.fixed.top-0.left-0.ml-2.mt-2(class="w-[20%]" src="/images/logo/logo_256x256.webp" alt="Logo")
+    img.bg-img.fixed.top-0.left-0.bg-repeat-x.bg-contain(class="" src="/images/bg/jgj-main-menu_655x320.jpg" alt="Main Menu Background")
     div.flex.w-full.my-3.mt-1
       div.mx-auto
         div.flex.justify-center
@@ -61,6 +63,16 @@ onUnmounted(() => {})
     //LoadingBar
 </template>
 
+<style lang="sass">
+.bg-img
+  background-color: #050505
+  background-image: url('/images/bg/jgj-main-menu_655x320.jpg')
+  background-repeat: no-repeat
+  background-size: cover
+  width: 100%
+  height: 100%
+  z-index: -1
+</style>
 <i18n>
 en:
   startGame: "Start Game"
