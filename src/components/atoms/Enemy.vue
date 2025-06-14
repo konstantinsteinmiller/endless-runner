@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, defineProps } from 'vue'
+import { prependBaseUrl } from '@/utils/function'
 
 interface EnemyProps {
   entity: {
@@ -48,7 +49,7 @@ const wobbleX = computed(() => {
     v-if="entity.type"
     :style="{ transform: `translate3d(${wobbleX}px, ${wobbleY}px, 0)`, width: `${entity.width}px`, height: `${entity.height}px` }"
     class="absolute z-50 rounded-full"
-    :src="`/images/enemies/enemy-${entity.type}.webp`" alt="enemy"
+    :src="`${prependBaseUrl('/images/enemies/enemy-'+entity.type+'.webp')}`" alt="enemy"
   )
 </template>
 

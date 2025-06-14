@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, defineProps } from 'vue'
+import { prependBaseUrl } from '@/utils/function'
 
 interface ObstacleProps {
   entity: {
@@ -25,16 +26,17 @@ const wobbleY = computed(() => {
   return props.entity.y + verticalOffset
 })
 
-const randomRotation = Math.random() * 100 - 50 // Random rotation between -30 and 30 degrees
+const randomRotation = Math.random() * 30 - 15 // Random rotation between -30 and 30 degrees
 </script>
 
 <template lang="pug">
-  img.obstacle(
-    v-if="entity.type"
-    :style="{ transform: `translate3d(${entity.x}px, ${wobbleY}px, 0) rotate(${randomRotation}deg) `, width: `${entity.width}px`, height: `${entity.height}px` }"
-    class="absolute z-[100] rounded-md"
-    :src="`/images/obstacles/obstacle-${entity.type}.webp`" alt="obstacle"
-  )
+  div.obstacle(class="relative z-20" :style="{ transform: `translate3d(${entity.x}px, ${wobbleY}px, 0) `, height: `${entity.y}px`, }")
+    img(
+      v-if="entity.type"
+      :style="{ transform: `scale(103%, 103%) rotate(${randomRotation}deg) ` , width: `${entity.width}px`, height: `${entity.height}px` }"
+      class="absolute z-[100]"
+      :src="`${prependBaseUrl('/images/obstacles/obstacle-'+entity.type+'.webp')}`" alt="obstacle"
+    )
 </template>
 
 <style scoped lang="sass"></style>

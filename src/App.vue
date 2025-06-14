@@ -9,6 +9,7 @@
 </template>
 
 <script setup lang="ts">
+import { GAME_HEIGHT, GAME_WIDTH } from '@/utils/constants.ts'
 import OptionsModal from '@/components/molecules/OptionsModal.vue'
 import useMatch from '@/use/useMatch.ts'
 import '@/global'

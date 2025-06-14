@@ -18,8 +18,8 @@ export const GAME_USER_LANGUAGE: string = `${GAME_NAME}UserLanguage`
 export const GAME_USER_SOUND_VOLUME: string = `${GAME_NAME}SoundVolume`
 export const GAME_USER_MUSIC_VOLUME: string = `${GAME_NAME}MusicVolume`
 
-export const GAME_WIDTH: number = window.innerWidth || 1280
-export const GAME_HEIGHT: number = window.innerHeight || 720
+export const GAME_WIDTH: number = Math.min(Math.max(window.innerWidth, 0), 800)
+export const GAME_HEIGHT: number = Math.min(Math.max(window.innerHeight, 0), 370)
 export const GRAVITY: number = 0.8
 export const JUMP_STRENGTH: number = 15
 export const JETPACK_THRUST_ACCELERATION = 0.4 // How much upward force per frame (adjust as needed)

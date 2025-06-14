@@ -29,7 +29,7 @@ import {
   TOTAL_ENEMY_TYPES,
 } from '@/utils/constants.ts'
 import Background from '@/components/atoms/Background.vue'
-import { OBSTACLE_TYPES, TOTAL_OBSTACLES_TYPES } from '@/utils/enums.ts'
+import { ENEMY_TYPES, OBSTACLE_TYPES, TOTAL_OBSTACLES_TYPES } from '@/utils/enums.ts'
 import Score from '@/components/atoms/Score.vue'
 
 // Match State
@@ -122,13 +122,14 @@ const updateGame = (deltaTime: number) => {
     const MAX_ENEMY_Y = GROUND_Y - ENEMY_HEIGHT
     const unclampedRandomInt = Math.floor(Math.random() * TOTAL_ENEMY_TYPES) + 1
     const type = unclampedRandomInt.clamp(0, TOTAL_ENEMY_TYPES)
+    const enemyDimensions = ENEMY_TYPES[type]
 
     const enemy = {
       id: Date.now() + Math.random(),
       x: GAME_WIDTH + Math.random() * 200, // Spawn just off-screen
       y: Math.floor(Math.random() * MAX_ENEMY_Y),
-      width: ENEMY_WIDTH,
-      height: ENEMY_HEIGHT,
+      width: enemyDimensions.width,
+      height: enemyDimensions.height,
       type, // Random type for variety
     }
     enemiesList.value.push(enemy)
@@ -149,8 +150,8 @@ const updateGame = (deltaTime: number) => {
       id: Date.now() + Math.random(),
       x: GAME_WIDTH + Math.floor(Math.random() * 300), // Spawn just off-screen
       y: Math.floor(Math.random() * MAX_OBSTACLE_Y),
-      width: OBSTACLE_TYPES[type].width,
-      height: OBSTACLE_TYPES[type].height,
+      width: obstacleDimensions.width,
+      height: obstacleDimensions.height,
       type, // Random type for variety
     }
     obstaclesList.value.push(obstacle)

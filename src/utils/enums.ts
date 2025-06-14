@@ -11,11 +11,28 @@
 // export type MenuItem = (typeof MENU)[keyof typeof MENU]
 
 import type { ENUM } from '@/types'
-import enemy from '@/components/atoms/Enemy.vue'
 
-export const ENEMY_TYPES: ENUM = {
-  '1': '/images/enemies/enemy-1.webp',
-  '2': '/images/enemies/enemy-2.webp',
+export const ENEMY_TYPES: { [s: string]: { width: number; height: number } } = {
+  1: {
+    width: 48,
+    height: 48,
+  },
+  2: {
+    width: 36,
+    height: 36,
+  },
+  3: {
+    width: 64,
+    height: 64,
+  },
+  4: {
+    width: 28,
+    height: 28,
+  },
+  5: {
+    width: 44,
+    height: 44,
+  },
 }
 export type EnemyType = (typeof ENEMY_TYPES)[keyof typeof ENEMY_TYPES]
 
