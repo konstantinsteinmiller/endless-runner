@@ -13,20 +13,20 @@ const bgMidOffset = ref(`${GROUND_OFFSET}px`)
     src="/images/bg/bg-far_607x324.jpg" alt="Far Background"
   )
   img.background-layer.absolute.top-0.left-0.w-full.h-full.z-0(
-    :style="{ transform: `translate3d(${bgFarX2}px, 0, 0)` }"
+    :style="{ transform: `translate3d(${bgFarX2}px, 0, 0) scaleX(101%)` }"
     src="/images/bg/bg-far_607x324.jpg" alt="Far Background"
   )
 
   // Mid Background (faster than far)
   img.background-layer.bg-mid.absolute.left-0.w-full.z-10.bg-contain(
     :style="{ transform: `translate3d(${bgMidX1}px, 0, 0)` }"
-    class="h-1/3 max-h-1/3"
-    src="/images/bg/bg-mid_418x116.webp" alt="Mid Background"
+    class="h-full"
+    src="/images/bg/bg-mid_607x324.webp" alt="Mid Background"
   )
   img.background-layer.bg-mid.absolute.left-0.w-full.z-10.bg-contain(
     :style="{ transform: `translate3d(${bgMidX2}px, 0, 0)` }"
-    class="h-1/3 max-h-1/3"
-    src="/images/bg/bg-mid_418x116.webp" alt="Mid Background"
+    class="h-full"
+    src="/images/bg/bg-mid_607x324.webp" alt="Mid Background"
   )
 
   // Foreground (main game speed - ground)

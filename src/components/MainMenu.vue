@@ -4,7 +4,7 @@ import router from '@/router'
 // import useAssets from '@/use/useAssets.ts'
 import useMatch from '@/use/useMatch.ts'
 import useUser from '@/use/useUser.ts'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import OptionsModal from '@/components/molecules/OptionsModal.vue'
 import XButton from '@/components/atoms/XButton.vue'
@@ -36,9 +36,9 @@ onUnmounted(() => {})
 
 <template lang="pug">
   div.fixed.top-0.left-0.w-full.h-full.relative
-    img.bg-img.fixed.top-0.left-0.bg-repeat-x.bg-contain(class="z-[-20]" src="/images/bg/jgj-main-menu_655x320.jpg" alt="Main Menu Background")
-    img.fixed.top-0.left-0.ml-2.mt-2(class="w-[20%] z-[10]" src="/images/logo/logo_256x256.webp" alt="Logo")
-    div.flex.w-full.my-3.mt-1
+    img.bg-img.absolute.top-0.left-0.bg-repeat-x.bg-contain(class="z-[-20]" src="/images/bg/jgj-main-menu_655x320.jpg" alt="Main Menu Background")
+    img.absolute.top-0.left-0.ml-2.mt-2(class="w-[20%] z-[10]" src="/images/logo/logo_256x256.webp" alt="Logo")
+    div.flex.w-full.my-3.mt-1(class="translate-y-[-50%] absolute top-1/2")
       div.mx-auto
         div.flex.justify-center
           XButton.with-bg.mt-3(

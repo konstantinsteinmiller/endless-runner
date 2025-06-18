@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineProps } from 'vue'
+import { computed, defineProps, watch } from 'vue'
 import { prependBaseUrl } from '@/utils/function'
 
 interface ObstacleProps {

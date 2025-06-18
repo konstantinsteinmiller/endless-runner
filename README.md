@@ -1,4 +1,4 @@
-#![Endless Runner banner](https://github.com/konstantinsteinmiller/endless-runner/blob/master/public/images/logo/logo_256x256.webp)
+![Endless Runner banner](https://github.com/konstantinsteinmiller/endless-runner/blob/master/public/images/logo/logo_256x256.webp)
 
 # Endless Runner
 

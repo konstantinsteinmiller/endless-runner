@@ -1,6 +1,6 @@
 <template lang="pug">
   div.flex.flex-col.h-screen.w-screen(id="main-app" class="sm:h-full")
-    main.game.relative
+    main.game.relative.overflow-hidden(:style="{ width: `${GAME_WIDTH}px`, height: `${GAME_HEIGHT}px` }")
       router-view
       OptionsModal(
         :show="isOptionsModalOpen"
@@ -37,6 +37,9 @@ body
   min-width: 320px
   min-height: 100vh
   overflow: hidden
+
+.game
+  margin: 0 auto
 
 .rib
   & *, &

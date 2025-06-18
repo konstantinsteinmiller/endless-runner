@@ -9,12 +9,16 @@
   - [x] Game Loop
   - [x] Game Over Logic
   - [x] Game Restart Logic
-  - [ ] Score System
+  - [x] Score System
+  - [ ] Pickup Items
+    - [ ] White Blood Cells
+    - [ ] Power-ups
 - [ ] Assets
   - [x] Player Placeholder image
   - [x] Background Placeholder image
-  - [ ] Enemy Placeholder image
-  - [ ] Obstacle Placeholder image
+  - [x] Enemy Placeholder image
+  - [x] Obstacle Placeholder image
+  - [ ] White Blood Cells
 
 - [x] Game Settings
   - [x] Game Sounds

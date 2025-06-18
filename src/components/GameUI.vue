@@ -31,6 +31,7 @@ import {
 import Background from '@/components/atoms/Background.vue'
 import { ENEMY_TYPES, OBSTACLE_TYPES, TOTAL_OBSTACLES_TYPES } from '@/utils/enums.ts'
 import Score from '@/components/atoms/Score.vue'
+import { v4 } from 'uuid'
 
 // Match State
 const { isGameOver, setIsGameOver, restartGame } = useMatch()
@@ -91,10 +92,10 @@ const updateGame = (deltaTime: number) => {
 
   // Update Enemies
   enemiesList.value.forEach(enemy => {
-    enemy.x -= SCROLL_SPEED_FOREGROUND * 1.1 * speed.value // Adjust speed based on game speed
+    enemy.x -= SCROLL_SPEED_FOREGROUND * 1.2 * speed.value // Adjust speed based on game speed
   })
   enemiesList.value = enemiesList.value.filter(entity => {
-    const didDodgeEntity = entity.x + entity.width < 0
+    const didDodgeEntity = entity.x + entity.width <= 0
     if (didDodgeEntity) {
       enemiesDodgedTotal++
     }
@@ -106,7 +107,7 @@ const updateGame = (deltaTime: number) => {
     obstacle.x -= SCROLL_SPEED_FOREGROUND * speed.value // Adjust speed based on game speed
   })
   obstaclesList.value = obstaclesList.value.filter(entity => {
-    const didDodgeEntity = entity.x + entity.width < 0
+    const didDodgeEntity = entity.x + entity.width <= 0
     if (didDodgeEntity) {
       obstaclesDodgedTotal++
     }
@@ -125,7 +126,7 @@ const updateGame = (deltaTime: number) => {
     const enemyDimensions = ENEMY_TYPES[type]
 
     const enemy = {
-      id: Date.now() + Math.random(),
+      id: v4(),
       x: GAME_WIDTH + Math.random() * 200, // Spawn just off-screen
       y: Math.floor(Math.random() * MAX_ENEMY_Y),
       width: enemyDimensions.width,
@@ -138,18 +139,16 @@ const updateGame = (deltaTime: number) => {
 
   // Spawn Obstacles
   obstacleSpawnTimer += deltaTime
-  if (
-    obstacleSpawnTimer > OBSTACLE_SPAWN_INTERVAL - speed.value * 50 &&
-    obstaclesList.value.length < maxObstaclesOnScreen.value
-  ) {
+  if (obstacleSpawnTimer > OBSTACLE_SPAWN_INTERVAL && obstaclesList.value.length <= maxObstaclesOnScreen.value) {
     const unclampedRandomInt = Math.floor(Math.random() * TOTAL_OBSTACLES_TYPES) + 1
     const type = unclampedRandomInt.clamp(0, TOTAL_ENEMY_TYPES)
     const obstacleDimensions = OBSTACLE_TYPES[type]
     const MAX_OBSTACLE_Y = GROUND_Y - obstacleDimensions.height
+    const yPos = Math.floor(Math.random() * MAX_OBSTACLE_Y)
     const obstacle = {
-      id: Date.now() + Math.random(),
-      x: GAME_WIDTH + Math.floor(Math.random() * 300), // Spawn just off-screen
-      y: Math.floor(Math.random() * MAX_OBSTACLE_Y),
+      id: v4(),
+      x: GAME_WIDTH + 300 + Math.floor(Math.random() * 300), // Spawn just off-screen
+      y: yPos,
       width: obstacleDimensions.width,
       height: obstacleDimensions.height,
       type, // Random type for variety
@@ -177,6 +176,11 @@ const updateGame = (deltaTime: number) => {
       setIsGameOver(true)
     }
   })
+
+  G.obstaclesDodgedTotal.value = obstaclesDodgedTotal
+  G.enemiesDodgedTotal.value = enemiesDodgedTotal
+  G.timePlayed.value = timePlayed.value
+  G.speed.value = speed.value
 }
 
 // Initialize Game Loop
@@ -212,12 +216,6 @@ onMounted(() => {})
 
 onUnmounted(() => {
   cleanup()
-})
-const gameWidth = computed(() => {
-  return GAME_WIDTH
-})
-const gameHeight = computed(() => {
-  return GAME_WIDTH
 })
 </script>
 
@@ -257,19 +255,11 @@ const gameHeight = computed(() => {
       //div Is Flying: {{ isFlying }}
       //div Enemies: {{ enemiesList.length }}
       //div Obstacles: {{ obstaclesList.length }}
-    Score(
-      :obstaclesTotal="obstaclesDodgedTotal"
-      :enemiesTotal="enemiesDodgedTotal"
-      :time="timePlayed"
-      :speed="speed"
-    )
+    Score
 </template>
 
 <style scoped lang="sass">
 .game-container
-  width: v-bind(gameWidth)
-  height: v-bind(gameHeight)
-  background-color: #87CEEB
   margin: 0 auto
 
   .background-layer
